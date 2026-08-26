@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Move to Metabolize — Aufthority</title>
+
+<!-- ── Umami Analytics ── -->
+<script defer src="https://cloud.umami.is/script.js"
+  data-website-id="f79c60f1-f9e7-4170-a979-f357ba756a18"></script>
+
+<!-- ── SEO ── -->
+<meta name="description" content="An interactive 3D guide to your muscles — what each group does, why it matters for metabolic health, and how to train it.">
+
+<!-- ── Open Graph ── -->
+<meta property="og:type"         content="website">
+<meta property="og:site_name"    content="Aufthority">
+<meta property="og:title"        content="Move to Metabolize">
+<meta property="og:description"  content="An interactive 3D guide to your muscles — what each group does, why it matters for metabolic health, and how to train it.">
+<meta property="og:url"          content="https://www.aufthority.com/move-to-metabolize/">
+<meta property="og:image"        content="https://www.aufthority.com/preview_v2.png">
+<meta property="og:image:width"  content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale"       content="en_US">
+
+<!-- ── Twitter / X ── -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:site"        content="@theaufthority">
+<meta name="twitter:title"       content="Move to Metabolize">
+<meta name="twitter:description" content="An interactive 3D guide to your muscles and why they matter for metabolic health.">
+<meta name="twitter:image"       content="https://www.aufthority.com/preview_v2.png">
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:           #f7f5f0;
+  --ink:          #1a1a18;
+  --muted:        #6b6b62;
+  --accent:       #2d6a4f;
+  --accent-light: #e8f5ee;
+  --rule:         #e0ddd5;
+  --card-bg:      #ffffff;
+  --radius:       2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:           #141412;
+    --ink:          #f0ede6;
+    --muted:        #9a9a8e;
+    --accent:       #52b788;
+    --accent-light: #1a2e24;
+    --rule:         #2a2a26;
+    --card-bg:      #1e1e1a;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+/* ── Nav ── */
+nav {
+  padding: 28px 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--rule);
+}
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.logo span { color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; }
+.nav-links { display: flex; gap: 24px; list-style: none; }
+.nav-links a {
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.nav-links a:hover { color: var(--ink); }
+@media (max-width: 540px) {
+  .nav-links { gap: 16px; }
+  .nav-links a { font-size: 0.72rem; }
+}
+
+/* ── Hero ── */
+.hero { padding: 48px 0 32px; border-bottom: 1px solid var(--rule); }
+.section-label {
+  font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+}
+h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 16px;
+  max-width: 640px;
+}
+h1 em { font-style: italic; color: var(--accent); }
+.hero p { font-size: 1rem; color: var(--muted); max-width: 560px; }
+
+/* ── Explorer layout ── */
+.explorer {
+  padding: 40px 0 64px;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 800px) {
+  .explorer { grid-template-columns: 1fr; }
+}
+
+.viewer-card {
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+}
+#viewer {
+  width: 100%;
+  height: 480px;
+  border-radius: 8px;
+  touch-action: none;
+  cursor: grab;
+}
+#viewer:active { cursor: grabbing; }
+.viewer-hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 10px;
+}
+#loading-overlay {
+  position: absolute;
+  inset: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  flex-direction: column;
+  gap: 10px;
+}
+.spinner {
+  width: 22px; height: 22px;
+  border: 2px solid var(--rule);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.group-pills {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px;
+}
+.group-pill {
+  font-size: 0.72rem; color: var(--muted);
+  padding: 4px 12px; border: 1px solid var(--rule);
+  border-radius: 24px; cursor: pointer; background: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.12s;
+}
+.group-pill:hover { border-color: var(--accent); color: var(--ink); }
+.group-pill.active {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+/* ── Info panel ── */
+.panel {
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 24px;
+  min-height: 480px;
+}
+.panel-empty {
+  color: var(--muted);
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 430px;
+  text-align: center;
+}
+.panel-badge {
+  display: inline-block;
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.3rem;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+.panel-section-label {
+  font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+}
+.panel-body { font-size: 0.92rem; color: var(--ink); margin-bottom: 20px; }
+.panel-why {
+  font-size: 0.88rem; color: var(--muted); line-height: 1.65;
+  background: var(--accent-light); border-radius: 8px; padding: 12px 14px;
+  margin-bottom: 20px;
+}
+.panel-why-label { color: var(--accent); font-weight: 500; }
+.exercise-block { border-top: 1px solid var(--rule); padding-top: 18px; }
+.exercise-name { font-family: 'DM Serif Display', serif; font-size: 1rem; margin-bottom: 8px; }
+.exercise-img {
+  width: 100%; max-width: 280px; border-radius: 8px; margin-bottom: 10px; display: block;
+}
+.exercise-cue { font-size: 0.86rem; color: var(--muted); margin-bottom: 6px; }
+.exercise-equip { font-size: 0.76rem; color: var(--muted); font-style: italic; }
+.exercise-soon {
+  font-size: 0.85rem; color: var(--muted); font-style: italic;
+  padding: 10px 0;
+}
+
+/* ── Footer ── */
+footer {
+  padding: 40px 0 32px;
+  border-top: 1px solid var(--rule);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.footer-inner { display: flex; flex-direction: column; gap: 16px; }
+.footer-social { display: flex; gap: 20px; list-style: none; flex-wrap: wrap; }
+.footer-social a { color: var(--muted); text-decoration: none; font-size: 0.8rem; transition: color 0.15s; }
+.footer-social a:hover { color: var(--ink); }
+.footer-tagline { font-style: italic; color: var(--muted); }
+.footer-credit { font-size: 0.72rem; color: var(--muted); opacity: 0.8; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container" style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+    <a href="https://www.aufthority.com" class="logo">Aufthority <span>/ Move to Metabolize</span></a>
+    <ul class="nav-links">
+      <li><a href="https://www.aufthority.com">Home</a></li>
+      <li><a href="https://www.aufthority.com/#apps">Apps</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="hero">
+    <p class="section-label">Education</p>
+    <h1>Your muscles do more than <em>move you.</em></h1>
+    <p>Tap or click any part of the body below to learn what that muscle group does, why it matters for your health, and one simple exercise to train it.</p>
+  </div>
+
+  <div class="explorer">
+    <div class="viewer-card">
+      <canvas id="viewer"></canvas>
+      <div id="loading-overlay">
+        <div class="spinner"></div>
+        <span>Loading the model…</span>
+      </div>
+      <p class="viewer-hint">Drag to rotate · scroll to zoom · tap a region to select it</p>
+      <div class="group-pills" id="group-pills"></div>
+    </div>
+
+    <div class="panel" id="panel">
+      <div class="panel-empty">Tap or click a region on the model to begin.</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <ul class="footer-social">
+        <li><a href="https://www.threads.net/@theaufthority" target="_blank">Threads</a></li>
+        <li><a href="https://www.instagram.com/theaufthority" target="_blank">Instagram</a></li>
+        <li><a href="https://www.tiktok.com/@theaufthority" target="_blank">TikTok</a></li>
+        <li><a href="https://www.linkedin.com/in/aufbinali/" target="_blank">LinkedIn</a></li>
+      </ul>
+      <p>© 2026 Aufthority</p>
+      <p class="footer-tagline">Informed decisions, better health.</p>
+      <p class="footer-credit">3D anatomy data: BodyParts3D (DBCLS, CC BY-SA 2.1 Japan) and Z-Anatomy by Gauthier Kervyn (CC BY-SA 4.0), adapted from the BodyExplorer project. Exercise reference data: free-exercise-db (public domain).</p>
+    </div>
+  </div>
+</footer>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+
+let content = {};
+try {
+  const res = await fetch('assets/content.json');
+  content = await res.json();
+} catch (e) {
+  console.error('Failed to load content.json', e);
+}
+
+const canvas = document.getElementById('viewer');
+const loadingOverlay = document.getElementById('loading-overlay');
+const panel = document.getElementById('panel');
+const pillsContainer = document.getElementById('group-pills');
+
+const scene = new THREE.Scene();
+scene.background = null;
+
+const camera = new THREE.PerspectiveCamera(35, canvas.clientWidth / canvas.clientHeight, 1, 5000);
+camera.position.set(0, 900, 1400);
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.1);
+scene.add(hemiLight);
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+dirLight.position.set(300, 800, 600);
+scene.add(dirLight);
+const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+dirLight2.position.set(-300, 200, -400);
+scene.add(dirLight2);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 700, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.minDistance = 300;
+controls.maxDistance = 2500;
+controls.update();
+
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/draco/');
+const gltfLoader = new GLTFLoader();
+gltfLoader.setDRACOLoader(dracoLoader);
+
+const groupMeshes = {};
+const baseColors = new Map();
+let modelRoot = null;
+let activeGroup = null;
+let hoveredGroup = null;
+
+gltfLoader.load(
+  'assets/anatomy_grouped_draco.glb',
+  (gltf) => {
+    modelRoot = gltf.scene;
+    scene.add(modelRoot);
+
+    modelRoot.traverse((obj) => {
+      if (obj.isMesh) {
+        groupMeshes[obj.name] = obj;
+        obj.material = obj.material.clone();
+        baseColors.set(obj.name, obj.material.color.clone());
+      }
+    });
+
+    const box = new THREE.Box3().setFromObject(modelRoot);
+    const center = box.getCenter(new THREE.Vector3());
+    controls.target.copy(center);
+    camera.position.set(center.x, center.y, center.z + box.getSize(new THREE.Vector3()).length() * 0.9);
+    controls.update();
+
+    buildPills();
+    loadingOverlay.style.display = 'none';
+  },
+  undefined,
+  (err) => {
+    console.error('Failed to load model', err);
+    loadingOverlay.innerHTML = '<span>Couldn\u2019t load the 3D model. Please refresh.</span>';
+  }
+);
+
+function buildPills() {
+  pillsContainer.innerHTML = '';
+  Object.keys(groupMeshes).sort((a, b) => {
+    const la = content[a]?.label || a;
+    const lb = content[b]?.label || b;
+    return la.localeCompare(lb);
+  }).forEach((key) => {
+    const btn = document.createElement('button');
+    btn.className = 'group-pill';
+    btn.id = 'pill-' + key;
+    btn.textContent = content[key]?.label || key;
+    btn.addEventListener('click', () => selectGroup(key));
+    pillsContainer.appendChild(btn);
+  });
+}
+
+function setHighlight(name, on) {
+  const mesh = groupMeshes[name];
+  if (!mesh) return;
+  const base = baseColors.get(name);
+  if (on) {
+    mesh.material.color.setRGB(
+      Math.min(base.r * 1.35 + 0.15, 1),
+      Math.min(base.g * 1.35 + 0.1, 1),
+      Math.min(base.b * 1.35 + 0.1, 1)
+    );
+  } else {
+    mesh.material.color.copy(base);
+  }
+}
+
+function selectGroup(key) {
+  if (activeGroup && activeGroup !== key) setHighlight(activeGroup, false);
+  activeGroup = key;
+  setHighlight(key, true);
+
+  document.querySelectorAll('.group-pill').forEach((p) => p.classList.remove('active'));
+  const activePill = document.getElementById('pill-' + key);
+  if (activePill) activePill.classList.add('active');
+
+  renderPanel(key);
+}
+
+function renderPanel(key) {
+  const data = content[key];
+  if (!data) {
+    panel.innerHTML = '<div class="panel-empty">No information available for this region yet.</div>';
+    return;
+  }
+
+  let exerciseHtml = '';
+  if (data.exercise) {
+    const imgPath = 'assets/images/' + key + '.jpg';
+    exerciseHtml = `
+      <div class="exercise-block">
+        <p class="panel-section-label">Try this</p>
+        <img class="exercise-img" src="${imgPath}" alt="${escapeHtml(data.exercise.name)}" loading="lazy" />
+        <p class="exercise-name">${escapeHtml(data.exercise.name)}</p>
+        <p class="exercise-cue">${escapeHtml(data.exercise.cue)}</p>
+        <p class="exercise-equip">${escapeHtml(data.exercise.equipmentNote || '')}</p>
+      </div>
+    `;
+  } else {
+    exerciseHtml = `
+      <div class="exercise-block">
+        <p class="panel-section-label">Try this</p>
+        <p class="exercise-soon">A matching exercise for this region is coming soon.</p>
+      </div>
+    `;
+  }
+
+  panel.innerHTML = `
+    <p class="panel-badge">${escapeHtml(data.label)}</p>
+    <p class="panel-body">${escapeHtml(data.description)}</p>
+    ${data.whyItMatters ? `<p class="panel-why"><span class="panel-why-label">Why it matters — </span>${escapeHtml(data.whyItMatters)}</p>` : ''}
+    ${exerciseHtml}
+  `;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
+function pointerToNdc(clientX, clientY) {
+  const rect = canvas.getBoundingClientRect();
+  pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+}
+
+function pickAt(clientX, clientY) {
+  if (!modelRoot) return null;
+  pointerToNdc(clientX, clientY);
+  raycaster.setFromCamera(pointer, camera);
+  const intersects = raycaster.intersectObjects(Object.values(groupMeshes), false);
+  return intersects.length > 0 ? intersects[0].object.name : null;
+}
+
+let pointerDownPos = null;
+
+canvas.addEventListener('pointerdown', (e) => {
+  pointerDownPos = { x: e.clientX, y: e.clientY };
+});
+
+canvas.addEventListener('pointerup', (e) => {
+  if (!pointerDownPos) return;
+  const dx = e.clientX - pointerDownPos.x;
+  const dy = e.clientY - pointerDownPos.y;
+  const moved = Math.sqrt(dx * dx + dy * dy);
+  pointerDownPos = null;
+  if (moved > 6) return; // treat as a drag, not a click
+
+  const hit = pickAt(e.clientX, e.clientY);
+  if (hit) selectGroup(hit);
+});
+
+canvas.addEventListener('pointermove', (e) => {
+  const hit = pickAt(e.clientX, e.clientY);
+  if (hit === hoveredGroup) return;
+  if (hoveredGroup && hoveredGroup !== activeGroup) setHighlight(hoveredGroup, false);
+  if (hit && hit !== activeGroup) setHighlight(hit, true);
+  hoveredGroup = hit;
+  canvas.style.cursor = hit ? 'pointer' : 'grab';
+});
+
+window.addEventListener('resize', () => {
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h, false);
+});
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
