@@ -57,113 +57,121 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
+html, body {
+  height: 100%;
+  overscroll-behavior: none;
+}
 
 body {
   background: var(--bg);
   color: var(--ink);
   font-family: 'DM Sans', sans-serif;
   font-weight: 300;
-  line-height: 1.7;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-.container {
-  max-width: 1040px;
-  margin: 0 auto;
-  padding: 0 28px;
+/* ── App shell: fills the viewport exactly, no page-level scroll ── */
+.app {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* ── Nav ── */
-nav {
-  padding: 28px 0 24px;
+/* Fallback for very short viewports (phone landscape, tiny windows):
+   forcing zero scroll there just breaks usability, so let the page
+   scroll normally below this threshold instead of clipping content. */
+@media (max-height: 480px) {
+  html, body { height: auto; overflow-y: auto; }
+  .app { height: auto; min-height: 100dvh; overflow: visible; }
+}
+
+/* ── Header (nav + tagline merged into one compact bar) ── */
+.topbar {
+  flex: 0 0 auto;
+  padding: 14px 24px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 20px;
   border-bottom: 1px solid var(--rule);
+  flex-wrap: wrap;
 }
 .logo {
   font-family: 'DM Serif Display', serif;
-  font-size: 1.15rem;
-  letter-spacing: 0.01em;
+  font-size: 1.05rem;
   color: var(--ink);
   text-decoration: none;
+  white-space: nowrap;
 }
-.logo span { color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; }
-.nav-links { display: flex; gap: 24px; list-style: none; }
-.nav-links a {
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+.logo span { color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.8rem; }
+.topbar-tagline {
+  font-size: 0.82rem;
   color: var(--muted);
-  text-decoration: none;
-  transition: color 0.15s;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.topbar-tagline em { font-style: italic; color: var(--accent); }
+.nav-links { display: flex; gap: 18px; list-style: none; flex: 0 0 auto; }
+.nav-links a {
+  font-size: 0.72rem; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--muted); text-decoration: none;
 }
 .nav-links a:hover { color: var(--ink); }
-@media (max-width: 540px) {
-  .nav-links { gap: 16px; }
-  .nav-links a { font-size: 0.72rem; }
-}
 
-/* ── Hero ── */
-.hero { padding: 48px 0 32px; border-bottom: 1px solid var(--rule); }
-.section-label {
-  font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
-}
-h1 {
-  font-family: 'DM Serif Display', serif;
-  font-size: clamp(2rem, 5vw, 2.8rem);
-  line-height: 1.15;
-  color: var(--ink);
-  margin-bottom: 16px;
-  max-width: 640px;
-}
-h1 em { font-style: italic; color: var(--accent); }
-.hero p { font-size: 1rem; color: var(--muted); max-width: 560px; }
-
-/* ── Explorer layout ── */
+/* ── Explorer: fills all remaining vertical space ── */
 .explorer {
-  padding: 40px 0 64px;
-  display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: 24px;
-  align-items: start;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  gap: 16px;
+  padding: 16px 24px;
 }
 @media (max-width: 800px) {
-  .explorer { grid-template-columns: 1fr; }
+  .explorer { flex-direction: column; padding: 12px; gap: 12px; }
 }
 
 .viewer-card {
+  flex: 1.3 1 0;
+  min-width: 0;
+  min-height: 0;
   background: var(--card-bg);
   border: 1px solid var(--rule);
   border-radius: 12px;
-  padding: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+@media (max-width: 800px) {
+  .viewer-card { flex: 0 0 44%; }
+}
+
+.viewer-stage {
+  flex: 1 1 auto;
+  min-height: 0;
   position: relative;
+  border-radius: 8px;
+  overflow: hidden;
 }
 #viewer {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: 480px;
-  border-radius: 8px;
+  height: 100%;
   touch-action: none;
   cursor: grab;
+  display: block;
 }
 #viewer:active { cursor: grabbing; }
-.viewer-hint {
-  font-size: 0.78rem;
-  color: var(--muted);
-  text-align: center;
-  margin-top: 10px;
-}
+
 #loading-overlay {
   position: absolute;
-  inset: 16px;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--card-bg);
-  border-radius: 8px;
   font-size: 0.85rem;
   color: var(--muted);
   flex-direction: column;
@@ -178,14 +186,29 @@ h1 em { font-style: italic; color: var(--accent); }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+.viewer-footer { flex: 0 0 auto; }
+.viewer-hint {
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
 .group-pills {
-  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px;
+  display: flex; flex-wrap: nowrap; gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+}
+@media (min-width: 801px) {
+  .group-pills { flex-wrap: wrap; overflow-x: visible; }
 }
 .group-pill {
   font-size: 0.72rem; color: var(--muted);
   padding: 4px 12px; border: 1px solid var(--rule);
   border-radius: 24px; cursor: pointer; background: none;
   font-family: 'DM Sans', sans-serif;
+  white-space: nowrap; flex: 0 0 auto;
   transition: all 0.12s;
 }
 .group-pill:hover { border-color: var(--accent); color: var(--ink); }
@@ -196,118 +219,132 @@ h1 em { font-style: italic; color: var(--accent); }
 }
 
 /* ── Info panel ── */
+.panel-wrap {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}
 .panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   background: var(--card-bg);
   border: 1px solid var(--rule);
   border-radius: 12px;
-  padding: 24px;
-  min-height: 480px;
+  padding: 20px;
 }
 .panel-empty {
   color: var(--muted);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 430px;
   text-align: center;
 }
 .panel-badge {
   display: inline-block;
   font-family: 'DM Serif Display', serif;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   color: var(--ink);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 .panel-section-label {
   font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em;
   text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
 }
-.panel-body { font-size: 0.92rem; color: var(--ink); margin-bottom: 20px; }
+.panel-body { font-size: 0.9rem; color: var(--ink); margin-bottom: 16px; }
 .panel-why {
-  font-size: 0.88rem; color: var(--muted); line-height: 1.65;
-  background: var(--accent-light); border-radius: 8px; padding: 12px 14px;
-  margin-bottom: 20px;
+  font-size: 0.86rem; color: var(--muted); line-height: 1.6;
+  background: var(--accent-light); border-radius: 8px; padding: 10px 12px;
+  margin-bottom: 16px;
 }
 .panel-why-label { color: var(--accent); font-weight: 500; }
-.exercise-block { border-top: 1px solid var(--rule); padding-top: 18px; }
-.exercise-name { font-family: 'DM Serif Display', serif; font-size: 1rem; margin-bottom: 8px; }
+.exercise-block { border-top: 1px solid var(--rule); padding-top: 14px; }
+.exercise-name { font-family: 'DM Serif Display', serif; font-size: 0.98rem; margin-bottom: 8px; }
 .exercise-img {
-  width: 100%; max-width: 280px; border-radius: 8px; margin-bottom: 10px; display: block;
+  width: 100%; max-width: 240px; border-radius: 8px; margin-bottom: 8px; display: block;
 }
-.exercise-cue { font-size: 0.86rem; color: var(--muted); margin-bottom: 6px; }
-.exercise-equip { font-size: 0.76rem; color: var(--muted); font-style: italic; }
+.exercise-cue { font-size: 0.84rem; color: var(--muted); margin-bottom: 6px; }
+.exercise-equip { font-size: 0.74rem; color: var(--muted); font-style: italic; }
 .exercise-soon {
-  font-size: 0.85rem; color: var(--muted); font-style: italic;
-  padding: 10px 0;
+  font-size: 0.84rem; color: var(--muted); font-style: italic;
+  padding: 8px 0;
 }
 
-/* ── Footer ── */
-footer {
-  padding: 40px 0 32px;
+/* ── Footer: one slim, capped-height bar ── */
+.bottombar {
+  flex: 0 0 auto;
+  max-height: 64px;
+  overflow-y: auto;
+  padding: 8px 24px;
   border-top: 1px solid var(--rule);
-  font-size: 0.8rem;
+  font-size: 0.68rem;
   color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
-.footer-inner { display: flex; flex-direction: column; gap: 16px; }
-.footer-social { display: flex; gap: 20px; list-style: none; flex-wrap: wrap; }
-.footer-social a { color: var(--muted); text-decoration: none; font-size: 0.8rem; transition: color 0.15s; }
-.footer-social a:hover { color: var(--ink); }
-.footer-tagline { font-style: italic; color: var(--muted); }
-.footer-credit { font-size: 0.72rem; color: var(--muted); opacity: 0.8; }
+.bottombar .dot { opacity: 0.5; }
+.bottombar a { color: var(--muted); text-decoration: none; }
+.bottombar a:hover { color: var(--ink); }
+.footer-social { display: flex; gap: 12px; }
+.footer-credit { opacity: 0.75; }
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="container" style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+<div class="app">
+
+  <header class="topbar">
     <a href="https://www.aufthority.com" class="logo">Aufthority <span>/ Move to Metabolize</span></a>
+    <p class="topbar-tagline">Your muscles do more than <em>move you</em> — tap or click a region below to explore it.</p>
     <ul class="nav-links">
       <li><a href="https://www.aufthority.com">Home</a></li>
       <li><a href="https://www.aufthority.com/#apps">Apps</a></li>
     </ul>
-  </div>
-</nav>
+  </header>
 
-<div class="container">
-  <div class="hero">
-    <p class="section-label">Education</p>
-    <h1>Your muscles do more than <em>move you.</em></h1>
-    <p>Tap or click any part of the body below to learn what that muscle group does, why it matters for your health, and one simple exercise to train it.</p>
-  </div>
-
-  <div class="explorer">
+  <main class="explorer">
     <div class="viewer-card">
-      <canvas id="viewer"></canvas>
-      <div id="loading-overlay">
-        <div class="spinner"></div>
-        <span>Loading the model…</span>
+      <div class="viewer-stage">
+        <canvas id="viewer"></canvas>
+        <div id="loading-overlay">
+          <div class="spinner"></div>
+          <span>Loading the model…</span>
+        </div>
       </div>
-      <p class="viewer-hint">Drag to rotate · scroll to zoom · tap a region to select it</p>
-      <div class="group-pills" id="group-pills"></div>
+      <div class="viewer-footer">
+        <p class="viewer-hint">Drag to rotate · scroll to zoom · tap a region to select it</p>
+        <div class="group-pills" id="group-pills"></div>
+      </div>
     </div>
 
-    <div class="panel" id="panel">
-      <div class="panel-empty">Tap or click a region on the model to begin.</div>
+    <div class="panel-wrap">
+      <div class="panel" id="panel">
+        <div class="panel-empty">Tap or click a region on the model to begin.</div>
+      </div>
     </div>
-  </div>
+  </main>
+
+  <footer class="bottombar">
+    <span>© 2026 Aufthority</span>
+    <span class="dot">·</span>
+    <span>Informed decisions, better health.</span>
+    <span class="dot">·</span>
+    <nav class="footer-social">
+      <a href="https://www.threads.net/@theaufthority" target="_blank">Threads</a>
+      <a href="https://www.instagram.com/theaufthority" target="_blank">Instagram</a>
+      <a href="https://www.tiktok.com/@theaufthority" target="_blank">TikTok</a>
+      <a href="https://www.linkedin.com/in/aufbinali/" target="_blank">LinkedIn</a>
+    </nav>
+    <span class="dot">·</span>
+    <span class="footer-credit">3D anatomy: BodyParts3D (DBCLS, CC BY-SA 2.1 Japan) &amp; Z-Anatomy by Gauthier Kervyn (CC BY-SA 4.0), via BodyExplorer. Exercise data: free-exercise-db (public domain).</span>
+  </footer>
+
 </div>
-
-<footer>
-  <div class="container">
-    <div class="footer-inner">
-      <ul class="footer-social">
-        <li><a href="https://www.threads.net/@theaufthority" target="_blank">Threads</a></li>
-        <li><a href="https://www.instagram.com/theaufthority" target="_blank">Instagram</a></li>
-        <li><a href="https://www.tiktok.com/@theaufthority" target="_blank">TikTok</a></li>
-        <li><a href="https://www.linkedin.com/in/aufbinali/" target="_blank">LinkedIn</a></li>
-      </ul>
-      <p>© 2026 Aufthority</p>
-      <p class="footer-tagline">Informed decisions, better health.</p>
-      <p class="footer-credit">3D anatomy data: BodyParts3D (DBCLS, CC BY-SA 2.1 Japan) and Z-Anatomy by Gauthier Kervyn (CC BY-SA 4.0), adapted from the BodyExplorer project. Exercise reference data: free-exercise-db (public domain).</p>
-    </div>
-  </div>
-</footer>
 
 <script type="importmap">
 {
@@ -332,6 +369,7 @@ try {
 }
 
 const canvas = document.getElementById('viewer');
+const stage = document.querySelector('.viewer-stage');
 const loadingOverlay = document.getElementById('loading-overlay');
 const panel = document.getElementById('panel');
 const pillsContainer = document.getElementById('group-pills');
@@ -339,12 +377,19 @@ const pillsContainer = document.getElementById('group-pills');
 const scene = new THREE.Scene();
 scene.background = null;
 
-const camera = new THREE.PerspectiveCamera(35, canvas.clientWidth / canvas.clientHeight, 1, 5000);
+function stageSize() {
+  const w = stage.clientWidth || 1;
+  const h = stage.clientHeight || 1;
+  return { w, h };
+}
+
+const { w: initW, h: initH } = stageSize();
+const camera = new THREE.PerspectiveCamera(35, initW / initH, 1, 5000);
 camera.position.set(0, 900, 1400);
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+renderer.setSize(initW, initH, false);
 
 const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.1);
 scene.add(hemiLight);
@@ -364,7 +409,7 @@ controls.maxDistance = 2500;
 controls.update();
 
 const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/draco/');
+dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
 const gltfLoader = new GLTFLoader();
 gltfLoader.setDRACOLoader(dracoLoader);
 
@@ -400,9 +445,18 @@ gltfLoader.load(
   undefined,
   (err) => {
     console.error('Failed to load model', err);
-    loadingOverlay.innerHTML = '<span>Couldn\u2019t load the 3D model. Please refresh.</span>';
+    const detail = (err && (err.message || err.target?.src)) || 'Unknown error';
+    loadingOverlay.innerHTML =
+      '<span>Couldn\u2019t load the 3D model.<br><span style="opacity:0.6;font-size:0.72rem">' +
+      escapeHtmlEarly(String(detail)) + '</span></span>';
   }
 );
+
+function escapeHtmlEarly(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
 
 function buildPills() {
   pillsContainer.innerHTML = '';
@@ -533,12 +587,17 @@ canvas.addEventListener('pointermove', (e) => {
   canvas.style.cursor = hit ? 'pointer' : 'grab';
 });
 
-window.addEventListener('resize', () => {
-  const w = canvas.clientWidth, h = canvas.clientHeight;
+// ResizeObserver instead of only window 'resize': the viewer-stage's size
+// changes whenever the flex layout recalculates (e.g. mobile browser chrome
+// showing/hiding), which doesn't always fire a window resize event.
+const resizeObserver = new ResizeObserver(() => {
+  const { w, h } = stageSize();
+  if (w === 0 || h === 0) return;
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
   renderer.setSize(w, h, false);
 });
+resizeObserver.observe(stage);
 
 function animate() {
   requestAnimationFrame(animate);
